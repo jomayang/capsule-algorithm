@@ -269,9 +269,7 @@ def update_losses(model, loss_meter_dict, count):
         loss_meter.update(loss.item(), count=count)
 
 def lab_to_rgb(L, ab):
-    """
-    Takes a batch of images
-    """
+    ''' Takes a batch of images. '''
     
     L = (L + 1.) * 50.
     ab = ab * 110.
@@ -312,9 +310,9 @@ def log_results(loss_meter_dict):
     for loss_name, loss_meter in loss_meter_dict.items():
         print(f"{loss_name}: {loss_meter.avg:.5f}")
 
-def get_norm_L_(img_path):
+def get_norm_L(img_path):
 
-  #Function recieves grayscale "L" path, and returns a normalized image [Between -1 and 1] with a flot32 Tensor format.
+  '''Function recieves grayscale "L" path, and returns a normalized image [Between -1 and 1] with a flot32 Tensor format. '''
   
   img_L = Image.open(img_path)
   img_L = np.array(img_L)
@@ -341,14 +339,15 @@ def colorizer(img_L, model):
 
 def colorized_rgb(img_path, model):
   
-  # Function recieves grayscale "L" path, and returns the RGB colorized image.
+  ''' Function recieves grayscale "L" path, and returns the RGB colorized image.'''
   
-  L = get_norm_L_(img_path)
+  L = get_norm_L(img_path)
   return colorizer(L, model)
 
-def visualize_colorized_img (img, save=False):############ Function to modify ############
 
-    # Function recieves a colorized image as a path(type of List), and returns a plot of an RGB image.
+def visualize_colorized_image (img, save=False):############ Function to modify ############
+
+    ''' Function recieves a colorized image as a path(type of List), and returns a plot of an RGB image.'''
     
     cm = 1/2.54  # centimeters in inches
     fig = plt.figure(figsize=(5*cm, 5*cm))
@@ -356,14 +355,16 @@ def visualize_colorized_img (img, save=False):############ Function to modify ##
     if save:
         fig.savefig(f"colorization_{time.time()}.jpg")
 
-def visualize_RGB(sequence, save=False):############ Function to modify ############
+
+def visualize_rgb(sequence, save=False):############ Function to modify ############
   
-  # Function recieves pathological RGB images as a list of paths, and returns a plot of all RGB images.
+  ''' Function recieves pathological RGB images as a list of paths, and returns a plot of all RGB images. '''
   
   cm = 1/2.54  # centimeters in inches
+  FIGSIZE = 30 * cm
   for i in range(len(sequence)):
     img = Image.open(sequence[i])
-    fig = plt.figure(figsize=(30*cm, 30*cm))
+    fig = plt.figure(figsize=(FIGSIZE, FIGSIZE))
     ax = plt.subplot(1, len(sequence), i + 1)
     ax.imshow(img)
     ax.axis("off")
@@ -433,7 +434,7 @@ def colorize_emergency_seq(paths, pathological_pointers, len_emergency_seq, mode
     
       print("One pathological sequence has been detected...")
       print("------------ Pathological sequence ------------")
-      #visualize_RGB(paths[pathological_pointers[0][0]:pathological_pointers[0][1]])
+      #visualize_rgb(paths[pathological_pointers[0][0]:pathological_pointers[0][1]])
       max_ = maximum(len(paths[:pathological_pointers[0][0]]), len(paths[pathological_pointers[0][1]:-1]))
     
       for x in range(max_):
@@ -441,12 +442,12 @@ def colorize_emergency_seq(paths, pathological_pointers, len_emergency_seq, mode
         if x <= len(paths[:pathological_pointers[0][0]]): # To colorize prior sequence
           im_i = paths[(pathological_pointers[0][0] - x)]
           im_i = colorized_rgb(im_i, model)
-          #visualize_colorized_img(im_i)
+          #visualize_colorized_image(im_i)
     
         if x <= len(paths[pathological_pointers[0][1]:-1]): # To colorize next sequence
           im_j = paths[(pathological_pointers[0][1] + x)]
           im_j = colorized_rgb(im_j, model)
-          #visualize_colorized_img(im_j)
+          #visualize_colorized_image(im_j)
     
     # case 2: more than one pathsological sequences to colorize for emergency use
     else:
@@ -455,7 +456,7 @@ def colorize_emergency_seq(paths, pathological_pointers, len_emergency_seq, mode
       
       for sequence in pathological_pointers:
         
-        #visualize_RGB(paths[(sequence[0]+1):sequence[1]]) 
+        #visualize_rgb(paths[(sequence[0]+1):sequence[1]]) 
         print(f"Colorizing the {sequence} is on progress..")
     
         for x in range(len_emergency_seq):
@@ -464,11 +465,11 @@ def colorize_emergency_seq(paths, pathological_pointers, len_emergency_seq, mode
             
             im_i = paths[(sequence[0] - x)]
             im_i = colorized_rgb(im_i, model)
-            #visualize_colorized_img(im_i) 
+            #visualize_colorized_image(im_i) 
     
             im_j = paths[(sequence[1] + x)]
             im_j = colorized_rgb(im_j, model)
-            #visualize_colorized_img(im_j)
+            #visualize_colorized_image(im_j)
     
     return print("[Done] Colorization of all emergency sequence.")
 
@@ -503,13 +504,13 @@ def colorize_rest_of_img(paths, pathological_pointers, len_emergency_seq, model)
         
                 im_i = paths[(pathological_pointers[y][0]- len_emergency_seq - x)]
                 im_i = colorized_rgb(im_i)
-                visualize_colorized_img(im_i)
+                visualize_colorized_image(im_i)
         
               if x <= next_j and next_j != 0: # To colorize next sequence
         
                 im_j = paths[(pathological_pointers[y][1] + len_emergency_seq+ x)]
                 im_j = colorized_rgb(im_j)
-                visualize_colorized_img(im_j)
+                visualize_colorized_image(im_j)
         print("[Done] Colorization of all grayscale images.")
 
     else:
@@ -540,11 +541,11 @@ def colorize_rest_of_img(paths, pathological_pointers, len_emergency_seq, model)
     
             im_i = paths[(pathological_pointers[y][0]- len_emergency_seq - x)]
             im_i = colorized_rgb(im_i, model)
-            #visualize_colorized_img(im_i)
+            #visualize_colorized_image(im_i)
     
           if x <= next_j and next_j != 0: 
     
             im_j = paths[(pathological_pointers[y][1] + len_emergency_seq+ x)]
             im_j = colorized_rgb(im_j, model)
-            #visualize_colorized_img(im_j)
+            #visualize_colorized_image(im_j)
     return print("[Done] Colorization of all grayscale images.")
