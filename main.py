@@ -84,7 +84,6 @@ def colorize_remaining_images(paths, pathological_pointers, emergency_sequence_l
     print('No pathological sequences found!')
     return
   
-
   for iteration_index in range(len(pathological_pointers)):
     current_sequence = pathological_pointers[iteration_index]
     
@@ -98,7 +97,6 @@ def colorize_remaining_images(paths, pathological_pointers, emergency_sequence_l
     next_sequence_start = next_sequence[0] - emergency_sequence_length if next_sequence else len(paths)
 
     next_image_before_sequence = len(paths[:current_sequence[0] - emergency_sequence_length])
-    
     next_image_after_sequence = len(paths[current_sequence[1] + emergency_sequence_length : next_sequence_start])
 
     number_of_iterations = maximum(next_image_before_sequence, next_image_after_sequence)
