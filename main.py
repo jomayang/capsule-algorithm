@@ -63,90 +63,84 @@ def colorize_emergency_sequences(paths, pathological_pointers, emergency_sequenc
 
       # Colorize image before pathological sequence with iteration_index
       if iteration_index <= len(paths[:first_pathological_image_position]): 
-        im_i = paths[first_pathological_image_position - iteration_index]
-        im_i = colorized_rgb(im_i, model)
-
+        image_to_colorize_before = paths[first_pathological_image_position - iteration_index]
+        colorized_image_before = colorized_rgb(image_to_colorize_before, model)
+        
+        # visualize_colorized_image(colorized_image_before)
+        
       # Colorize image after pathological sequence with iteration_index
       if iteration_index <= len(paths[last_pathological_image_position:-1]): 
-        im_j = paths[last_pathological_image_position + iteration_index]
-        im_j = colorized_rgb(im_j, model)
+        image_to_colorize_after = paths[last_pathological_image_position + iteration_index]
+        colorized_image_after = colorized_rgb(image_to_colorize_after, model)
+        
+        # visualize_colorized_image(colorized_image_after)
+      
 
   print("[Done] Colorization of all emergency sequence.")
+  
 
-
-def colorize_rest_of_img(paths, pathological_pointers, len_emergency_seq, model):
+def colorize_remaining_images(paths, pathological_pointers, emergency_sequence_length, model):
 
     # Colorization of the rest L images.
-
-    if len(pathological_pointers) > 1:
-
-        for y in range(len(pathological_pointers)):
-        
-            if pathological_pointers[0][0] == pathological_pointers[y][0]: # For first sequence 
-        
-              next_i = len(paths[:(pathological_pointers[0][0] - len_emergency_seq)])
-              next_j = len(paths[(pathological_pointers[0][1] + len_emergency_seq):(pathological_pointers[y+1][0] - len_emergency_seq)])  
-              
-            elif pathological_pointers[-1][-1] == pathological_pointers[y][-1]: # For last sequences 
-        
-              next_i = 0
-              next_j = len(paths[(pathological_pointers[-1][-1]+len_emergency_seq):-1])
-        
-            else: # For mid sequences 
-        
-              next_i = 0
-              next_j = len(paths[(pathological_pointers[y][1] + len_emergency_seq):(pathological_pointers[y+1][0] - len_emergency_seq)])
-        
-            max_ = maximum(next_i, next_j)
-        
-            for x in range((max_+1)):
-        
-              if x <= next_i and next_i != 0: # To colorize prior sequence
-        
-                im_i = paths[(pathological_pointers[y][0]- len_emergency_seq - x)]
-                im_i = colorized_rgb(im_i)
-                visualize_colorized_image(im_i)
-        
-              if x <= next_j and next_j != 0: # To colorize next sequence
-        
-                im_j = paths[(pathological_pointers[y][1] + len_emergency_seq+ x)]
-                im_j = colorized_rgb(im_j)
-                visualize_colorized_image(im_j)
-        print("[Done] Colorization of all grayscale images.")
-
-    else:
-        return None
-
-    for y in range(len(pathological_pointers)):
+    if len(pathological_pointers) < 1:
+      print('No pathological sequences found!')
+      return
     
-        if pathological_pointers[0][0] == pathological_pointers[y][0]:
+
+    for iteration_index in range(len(pathological_pointers)):
     
-          next_i = len(paths[:(pathological_pointers[0][0] - len_emergency_seq)])
-          next_j = len(paths[(pathological_pointers[0][1] + len_emergency_seq):(pathological_pointers[y+1][0] - len_emergency_seq)])  
+        if pathological_pointers[0][0] == pathological_pointers[iteration_index][0]: # For first sequence 
           
-        elif pathological_pointers[-1][-1] == pathological_pointers[y][-1]:
+          next_image_before_sequence = len(paths[
+              :(pathological_pointers[0][0] - emergency_sequence_length)
+            ])
+          next_image_after_sequence = len(paths[
+              (pathological_pointers[0][1] + emergency_sequence_length)
+              :
+              (pathological_pointers[iteration_index + 1][0] - emergency_sequence_length)
+            ])  
+          
+        elif pathological_pointers[-1][-1] == pathological_pointers[iteration_index][-1]: # For last sequences 
     
-          next_i = 0
-          next_j = len(paths[(pathological_pointers[-1][-1]+len_emergency_seq):-1])
+          next_image_before_sequence = 0
+          next_image_after_sequence = len(paths[
+                (pathological_pointers[-1][-1] + emergency_sequence_length)
+                :-1
+              ])
     
-        else: 
+        else: # For mid sequences 
     
-          next_i = 0
-          next_j = len(paths[(pathological_pointers[y][1] + len_emergency_seq):(pathological_pointers[y+1][0] - len_emergency_seq)])
+          next_image_before_sequence = 0
+          next_image_after_sequence = len(paths[
+                (pathological_pointers[iteration_index][1] + emergency_sequence_length)
+                :
+                (pathological_pointers[iteration_index + 1][0] - emergency_sequence_length)
+              ])
     
-        max_ = maximum(next_i, next_j)
+        number_of_iterations = maximum(next_image_before_sequence, next_image_after_sequence)
     
-        for x in range((max_+1)):
+        for x in range(number_of_iterations + 1):
     
-          if x <= next_i and next_i != 0: 
+          if x <= next_image_before_sequence and next_image_before_sequence != 0: # To colorize prior sequence
     
-            im_i = paths[(pathological_pointers[y][0]- len_emergency_seq - x)]
-            im_i = colorized_rgb(im_i, model)
-            #visualize_colorized_image(im_i)
+            image_to_colorize_before = paths[
+                pathological_pointers[iteration_index][0]
+                - emergency_sequence_length 
+                - x ]
+            
+            colorized_image_after = colorized_rgb(image_to_colorize_before)
+            visualize_colorized_image(colorized_image_after)
     
-          if x <= next_j and next_j != 0: 
+          if x <= next_image_after_sequence and next_image_after_sequence != 0: # To colorize next sequence
     
-            im_j = paths[(pathological_pointers[y][1] + len_emergency_seq+ x)]
-            im_j = colorized_rgb(im_j, model)
-            #visualize_colorized_image(im_j)
-    return print("[Done] Colorization of all grayscale images.")
+            image_to_colorize_after = paths[
+                pathological_pointers[iteration_index][1] 
+                + emergency_sequence_length 
+                + x ]
+            
+            colorized_image_after = colorized_rgb(image_to_colorize_after)
+            visualize_colorized_image(colorized_image_after)
+
+    print("[Done] Colorization of all grayscale images.")
+
+    
