@@ -1,8 +1,7 @@
 import glob
 from utils import image_mode_check, maximum, colorized_rgb, visualize_colorized_image
-#retrieve pathological sequences pointers indeces.
 
-def retrieve_pathological_seq(path):
+def retrieve_pathological_sequences(path):
 
     paths = sorted(glob.glob(path + "/*.jpg")) 
     
@@ -81,56 +80,51 @@ def colorize_emergency_sequences(paths, pathological_pointers, emergency_sequenc
 
 def colorize_remaining_images(paths, pathological_pointers, emergency_sequence_length, model):
 
-    # Colorization of the rest L images.
-    if len(pathological_pointers) < 1:
-      print('No pathological sequences found!')
-      return
-    
+  if len(pathological_pointers) < 1:
+    print('No pathological sequences found!')
+    return
+  
 
-    for iteration_index in range(len(pathological_pointers)):
-        current_sequence = pathological_pointers[iteration_index]
+  for iteration_index in range(len(pathological_pointers)):
+    current_sequence = pathological_pointers[iteration_index]
+    
+    if iteration_index == 0:
+        next_sequence = pathological_pointers[iteration_index + 1]
+    elif iteration_index == len(pathological_pointers) - 1:
+        next_sequence = None
+    else:
+        next_sequence = pathological_pointers[iteration_index + 1]
+
+    next_sequence_start = next_sequence[0] - emergency_sequence_length if next_sequence else len(paths)
+
+    next_image_before_sequence = len(paths[:current_sequence[0] - emergency_sequence_length])
+    
+    next_image_after_sequence = len(paths[current_sequence[1] + emergency_sequence_length : next_sequence_start])
+
+    number_of_iterations = maximum(next_image_before_sequence, next_image_after_sequence)
+    
+    for x in range(number_of_iterations + 1):
+    
+      if x <= next_image_before_sequence and next_image_before_sequence != 0: # To colorize prior sequence
+    
+        image_to_colorize_before = paths[
+            pathological_pointers[iteration_index][0]
+            - emergency_sequence_length 
+            - x ]
         
-        if iteration_index == 0:
-            next_sequence = pathological_pointers[iteration_index + 1]
-        elif iteration_index == len(pathological_pointers) - 1:
-            next_sequence = None
-        else:
-            next_sequence = pathological_pointers[iteration_index + 1]
-
-        next_sequence_start = next_sequence[0] - emergency_sequence_length if next_sequence else len(paths)
-
-        next_image_before_sequence = len(paths[:current_sequence[0] - emergency_sequence_length])
+        colorized_image_after = colorized_rgb(image_to_colorize_before)
+        # visualize_colorized_image(colorized_image_after)
+    
+      if x <= next_image_after_sequence and next_image_after_sequence != 0: # To colorize next sequence
+    
+        image_to_colorize_after = paths[
+            pathological_pointers[iteration_index][1] 
+            + emergency_sequence_length 
+            + x ]
         
-        next_image_after_sequence = len(paths[
-            current_sequence[1] + emergency_sequence_length
-            :
-            next_sequence_start
-          ])
+        colorized_image_after = colorized_rgb(image_to_colorize_after)
+        # visualize_colorized_image(colorized_image_after)
 
-        number_of_iterations = maximum(next_image_before_sequence, next_image_after_sequence)
-    
-        for x in range(number_of_iterations + 1):
-    
-          if x <= next_image_before_sequence and next_image_before_sequence != 0: # To colorize prior sequence
-    
-            image_to_colorize_before = paths[
-                pathological_pointers[iteration_index][0]
-                - emergency_sequence_length 
-                - x ]
-            
-            colorized_image_after = colorized_rgb(image_to_colorize_before)
-            visualize_colorized_image(colorized_image_after)
-    
-          if x <= next_image_after_sequence and next_image_after_sequence != 0: # To colorize next sequence
-    
-            image_to_colorize_after = paths[
-                pathological_pointers[iteration_index][1] 
-                + emergency_sequence_length 
-                + x ]
-            
-            colorized_image_after = colorized_rgb(image_to_colorize_after)
-            visualize_colorized_image(colorized_image_after)
-
-    print("[Done] Colorization of all grayscale images.")
+  print("[Done] Colorization of all grayscale images.")
 
     
