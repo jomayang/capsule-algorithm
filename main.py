@@ -88,35 +88,25 @@ def colorize_remaining_images(paths, pathological_pointers, emergency_sequence_l
     
 
     for iteration_index in range(len(pathological_pointers)):
-    
-        if pathological_pointers[0][0] == pathological_pointers[iteration_index][0]: # For first sequence 
-          
-          next_image_before_sequence = len(paths[
-              :(pathological_pointers[0][0] - emergency_sequence_length)
-            ])
-          next_image_after_sequence = len(paths[
-              (pathological_pointers[0][1] + emergency_sequence_length)
-              :
-              (pathological_pointers[iteration_index + 1][0] - emergency_sequence_length)
-            ])  
-          
-        elif pathological_pointers[-1][-1] == pathological_pointers[iteration_index][-1]: # For last sequences 
-    
-          next_image_before_sequence = 0
-          next_image_after_sequence = len(paths[
-                (pathological_pointers[-1][-1] + emergency_sequence_length)
-                :-1
-              ])
-    
-        else: # For mid sequences 
-    
-          next_image_before_sequence = 0
-          next_image_after_sequence = len(paths[
-                (pathological_pointers[iteration_index][1] + emergency_sequence_length)
-                :
-                (pathological_pointers[iteration_index + 1][0] - emergency_sequence_length)
-              ])
-    
+        current_sequence = pathological_pointers[iteration_index]
+        
+        if iteration_index == 0:
+            next_sequence = pathological_pointers[iteration_index + 1]
+        elif iteration_index == len(pathological_pointers) - 1:
+            next_sequence = None
+        else:
+            next_sequence = pathological_pointers[iteration_index + 1]
+
+        next_sequence_start = next_sequence[0] - emergency_sequence_length if next_sequence else len(paths)
+
+        next_image_before_sequence = len(paths[:current_sequence[0] - emergency_sequence_length])
+        
+        next_image_after_sequence = len(paths[
+            current_sequence[1] + emergency_sequence_length
+            :
+            next_sequence_start
+          ])
+
         number_of_iterations = maximum(next_image_before_sequence, next_image_after_sequence)
     
         for x in range(number_of_iterations + 1):
