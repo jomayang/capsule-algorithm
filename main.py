@@ -27,7 +27,7 @@ def retrieve_pathological_sequences(path):
     
       else:
         if is_moving:
-          end = start + sequence_length # (start + (sequence_length - 1)) + 1
+          end = start + sequence_length 
           pathological_positions.append((start, sequence_length))
           pathological_pointers.append((start, end))
           
@@ -67,16 +67,12 @@ def colorize_emergency_sequences(paths, pathological_pointers, emergency_sequenc
         image_to_colorize_before = paths[first_pathological_image_position - iteration_index]
         colorized_image_before = colorized_rgb(image_to_colorize_before, model)
         
-        # visualize_colorized_image(colorized_image_before)
         
       # Colorize image after pathological sequence with iteration_index
       if iteration_index <= len(paths[last_pathological_image_position:-1]): 
         image_to_colorize_after = paths[last_pathological_image_position + iteration_index]
         colorized_image_after = colorized_rgb(image_to_colorize_after, model)
         
-        # visualize_colorized_image(colorized_image_after)
-      
-
   print("[Done] Colorization of all emergency sequence.")
   
 
@@ -113,7 +109,6 @@ def colorize_remaining_images(paths, pathological_pointers, emergency_sequence_l
             - x ]
         
         colorized_image_after = colorized_rgb(image_to_colorize_before)
-        # visualize_colorized_image(colorized_image_after)
     
       if x <= next_image_after_sequence and next_image_after_sequence != 0: # To colorize next sequence
     
@@ -123,7 +118,6 @@ def colorize_remaining_images(paths, pathological_pointers, emergency_sequence_l
             + x ]
         
         colorized_image_after = colorized_rgb(image_to_colorize_after)
-        # visualize_colorized_image(colorized_image_after)
 
   print("[Done] Colorization of all grayscale images.")
 
