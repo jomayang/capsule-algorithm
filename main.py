@@ -26,7 +26,7 @@ def retrieve_pathological_sequences(path):
           sequence_length += 1
     
       else:
-        if is_moving == True:
+        if is_moving:
           end = start + sequence_length # (start + (sequence_length - 1)) + 1
           pathological_positions.append((start, sequence_length))
           pathological_pointers.append((start, end))
