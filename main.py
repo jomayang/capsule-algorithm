@@ -13,19 +13,21 @@ def retrieve_pathological_sequences(path):
     pathological_pointers = []
     
     for img_path in paths:
-    
-      if image_mode_check(img_path) == "RGB":
+      
+      is_rgb = image_mode_check(img_path) == "RGB"
+
+      if is_rgb:
         
-        if is_moving == False:
+        if not is_moving:
           start = paths.index(img_path)
           sequence_length = 1
           is_moving = True
         else:
-          sequence_length = sequence_length + 1
+          sequence_length += 1
     
       else:
         if is_moving == True:
-          end = (start + (sequence_length - 1)) + 1
+          end = start + sequence_length # (start + (sequence_length - 1)) + 1
           pathological_positions.append((start, sequence_length))
           pathological_pointers.append((start, end))
           
